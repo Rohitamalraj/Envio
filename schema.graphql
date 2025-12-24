@@ -21,7 +21,7 @@ type Permission @entity {
 # Individual service execution record
 type ServiceExecution @entity {
   id: ID!                          # tx hash + log index
-  permission: Permission!          # reference to user permission
+  permission: Permission           # reference to user permission (optional)
   user: String!                    # user address
   serviceType: ServiceType!        # which service was executed
   cost: BigInt!                    # cost in USDC (6 decimals)

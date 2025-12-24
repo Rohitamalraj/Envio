@@ -103,14 +103,28 @@ PermiPayBilling.ServiceExecuted.handler(async ({ event, context }: any) => {
 
   context.ServiceExecution.set(execution);
 
-  // Update permission
-  const permission = await context.Permission.get(user.toLowerCase());
-  if (permission) {
+  // Update permission (create if doesn't exist - shouldn't happen but handle gracefully)
+  let permission = await context.Permission.get(user.toLowerCase());
+  if (!permission) {
+    // Create a minimal permission record if it doesn't exist
+    permission = {
+      id: user.toLowerCase(),
+      user: user.toLowerCase(),
+      spendingLimit: cost,
+      spentAmount: cost,
+      remainingBudget: 0n,
+      expiresAt: timestamp + 86400n, // 1 day default
+      isActive: true,
+      grantedAt: timestamp,
+      revokedAt: null,
+      totalExecutions: 1,
+    };
+  } else {
     permission.spentAmount += cost;
     permission.remainingBudget = remainingBudget;
     permission.totalExecutions += 1;
-    context.Permission.set(permission);
   }
+  context.Permission.set(permission);
 
   // Update global stats
   const globalStats = await getOrCreateGlobalStats(context);
