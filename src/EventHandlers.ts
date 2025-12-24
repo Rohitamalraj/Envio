@@ -7,8 +7,8 @@ import {
 } from "generated";
 
 // Helper to get or create global stats
-const getOrCreateGlobalStats = (context: any): GlobalStats => {
-  let stats = context.GlobalStats.get("global");
+const getOrCreateGlobalStats = async (context: any): Promise<GlobalStats> => {
+  let stats = await context.GlobalStats.get("global");
   if (!stats) {
     stats = {
       id: "global",
@@ -24,11 +24,11 @@ const getOrCreateGlobalStats = (context: any): GlobalStats => {
 }
 
 // Helper to get or create daily stats
-const getOrCreateDailyStats = (timestamp: bigint, context: any): DailyStats => {
+const getOrCreateDailyStats = async (timestamp: bigint, context: any): Promise<DailyStats> => {
   const date = new Date(Number(timestamp) * 1000);
   const dateStr = date.toISOString().split('T')[0];
   
-  let stats = context.DailyStats.get(dateStr);
+  let stats = await context.DailyStats.get(dateStr);
   if (!stats) {
     stats = {
       id: dateStr,
@@ -70,7 +70,7 @@ PermiPayBilling.PermissionGranted.handler(async ({ event, context }) => {
   context.Permission.set(permission);
 
   // Update global stats
-  const globalStats = getOrCreateGlobalStats(context);
+  const globalStats = await getOrCreateGlobalStats(context);
   globalStats.totalPermissionsGranted += 1n;
   globalStats.activePermissions += 1n;
   globalStats.uniqueUsers += 1n;
@@ -78,7 +78,7 @@ PermiPayBilling.PermissionGranted.handler(async ({ event, context }) => {
   context.GlobalStats.set(globalStats);
 
   // Update daily stats
-  const dailyStats = getOrCreateDailyStats(timestamp, context);
+  const dailyStats = await getOrCreateDailyStats(timestamp, context);
   dailyStats.permissionsGranted += 1;
   dailyStats.uniqueUsers += 1;
   context.DailyStats.set(dailyStats);
@@ -108,7 +108,7 @@ PermiPayBilling.ServiceExecuted.handler(async ({ event, context }) => {
   context.ServiceExecution.set(execution);
 
   // Update permission
-  const permission = context.Permission.get(user.toLowerCase());
+  const permission = await context.Permission.get(user.toLowerCase());
   if (permission) {
     permission.spentAmount += cost;
     permission.remainingBudget = remainingBudget;
@@ -117,14 +117,14 @@ PermiPayBilling.ServiceExecuted.handler(async ({ event, context }) => {
   }
 
   // Update global stats
-  const globalStats = getOrCreateGlobalStats(context);
+  const globalStats = await getOrCreateGlobalStats(context);
   globalStats.totalRevenue += cost;
   globalStats.totalExecutions += 1n;
   globalStats.lastUpdated = timestamp;
   context.GlobalStats.set(globalStats);
 
   // Update daily stats
-  const dailyStats = getOrCreateDailyStats(timestamp, context);
+  const dailyStats = await getOrCreateDailyStats(timestamp, context);
   dailyStats.serviceExecutions += 1;
   dailyStats.revenue += cost;
   
@@ -148,7 +148,7 @@ PermiPayBilling.PermissionRevoked.handler(async ({ event, context }) => {
   const { user, timestamp } = event.params;
 
   // Update permission
-  const permission = context.Permission.get(user.toLowerCase());
+  const permission = await context.Permission.get(user.toLowerCase());
   if (permission) {
     permission.isActive = false;
     permission.revokedAt = timestamp;
@@ -156,16 +156,15 @@ PermiPayBilling.PermissionRevoked.handler(async ({ event, context }) => {
   }
 
   // Update global stats
-  const globalStats = getOrCreateGlobalStats(context);
+  const globalStats = await getOrCreateGlobalStats(context);
   if (globalStats.activePermissions > 0n) {
     globalStats.activePermissions -= 1n;
   }
   globalStats.lastUpdated = timestamp;
   context.GlobalStats.set(globalStats);
-  context.GlobalStats.set(globalStats);
 
   // Update daily stats
-  const dailyStats = getOrCreateDailyStats(timestamp, context);
+  const dailyStats = await getOrCreateDailyStats(timestamp, context);
   dailyStats.permissionsRevoked += 1;
   context.DailyStats.set(dailyStats);
 });
