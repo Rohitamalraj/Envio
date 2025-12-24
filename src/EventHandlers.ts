@@ -7,7 +7,7 @@ import {
 } from "generated";
 
 // Helper to get or create global stats
-function getOrCreateGlobalStats(context: any): GlobalStats {
+const getOrCreateGlobalStats = (context: any): GlobalStats => {
   let stats = context.GlobalStats.get("global");
   if (!stats) {
     stats = {
@@ -24,7 +24,7 @@ function getOrCreateGlobalStats(context: any): GlobalStats {
 }
 
 // Helper to get or create daily stats
-function getOrCreateDailyStats(timestamp: bigint, context: any): DailyStats {
+const getOrCreateDailyStats = (timestamp: bigint, context: any): DailyStats => {
   const date = new Date(Number(timestamp) * 1000);
   const dateStr = date.toISOString().split('T')[0];
   
@@ -54,7 +54,7 @@ PermiPayBilling.PermissionGranted.handler(async ({ event, context }) => {
   const { user, spendingLimit, expiresAt, timestamp } = event.params;
 
   // Create or update permission entity
-  const permission: Permission = {
+  const permission = {
     id: user.toLowerCase(),
     user: user.toLowerCase(),
     spendingLimit,
@@ -63,7 +63,7 @@ PermiPayBilling.PermissionGranted.handler(async ({ event, context }) => {
     expiresAt,
     isActive: true,
     grantedAt: timestamp,
-    revokedAt: undefined,
+    revokedAt: null,
     totalExecutions: 0,
   };
 
@@ -94,11 +94,11 @@ PermiPayBilling.ServiceExecuted.handler(async ({ event, context }) => {
 
   // Create service execution record
   const executionId = `${txHash}-${event.logIndex}`;
-  const execution: ServiceExecution = {
+  const execution = {
     id: executionId,
     permission: user.toLowerCase(),
     user: user.toLowerCase(),
-    serviceType: ["CONTRACT_INSPECTOR", "WALLET_REPUTATION", "WALLET_AUDIT"][serviceType],
+    serviceType: ["CONTRACT_INSPECTOR", "WALLET_REPUTATION", "WALLET_AUDIT"][Number(serviceType)],
     cost,
     remainingBudget,
     timestamp,
@@ -129,17 +129,17 @@ PermiPayBilling.ServiceExecuted.handler(async ({ event, context }) => {
   dailyStats.revenue += cost;
   
   // Increment specific service counter
-  if (serviceType === 0) {
+  const serviceTypeNum = Number(serviceType);
+  if (serviceTypeNum === 0) {
     dailyStats.contractInspectorCount += 1;
-  } else if (serviceType === 1) {
+  } else if (serviceTypeNum === 1) {
     dailyStats.walletReputationCount += 1;
-  } else if (serviceType === 2) {
+  } else if (serviceTypeNum === 2) {
     dailyStats.walletAuditCount += 1;
   }
   
   context.DailyStats.set(dailyStats);
 });
-
 /**
  * Handler for PermissionRevoked event
  * Emitted when a user manually revokes their permission
@@ -157,8 +157,11 @@ PermiPayBilling.PermissionRevoked.handler(async ({ event, context }) => {
 
   // Update global stats
   const globalStats = getOrCreateGlobalStats(context);
-  globalStats.activePermissions -= 1n;
+  if (globalStats.activePermissions > 0n) {
+    globalStats.activePermissions -= 1n;
+  }
   globalStats.lastUpdated = timestamp;
+  context.GlobalStats.set(globalStats);
   context.GlobalStats.set(globalStats);
 
   // Update daily stats
