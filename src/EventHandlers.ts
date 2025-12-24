@@ -164,3 +164,4 @@ PermiPayBilling.PermissionRevoked.handler(async ({ event, context }: any) => {
   dailyStats.permissionsRevoked += 1;
   context.DailyStats.set(dailyStats);
 });
+
