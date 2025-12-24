@@ -9,6 +9,7 @@ networks:
       - name: PermiPayBilling
         address: 
           - "0x6B3c3435DfC8dE86018dC311915E8D7af826c3Fa" # Deployed PermiPayBilling contract
+        abi_file_path: ./abis/PermiPayBilling.json
         handler: src/EventHandlers.ts
         events:
           - event: PermissionGranted(address indexed user, uint256 spendingLimit, uint256 expiresAt, uint256 timestamp)
