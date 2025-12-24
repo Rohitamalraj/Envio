@@ -1,10 +1,6 @@
-import {
+const {
   PermiPayBilling,
-  Permission,
-  ServiceExecution,
-  GlobalStats,
-  DailyStats,
-} from "generated";
+} = require("generated");
 
 // Helper to get or create global stats
 const getOrCreateGlobalStats = async (context: any): Promise<GlobalStats> => {
