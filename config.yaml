@@ -12,9 +12,9 @@ networks:
         abi_file_path: ./abis/PermiPayBilling.json
         handler: src/EventHandlers.ts
         events:
-          - event: PermissionGranted(address indexed user, uint256 spendingLimit, uint256 expiresAt, uint256 timestamp)
-          - event: ServiceExecuted(address indexed user, uint8 indexed serviceType, uint256 cost, uint256 remainingBudget, uint256 timestamp)
-          - event: PermissionRevoked(address indexed user, uint256 timestamp)
+          - event: PermissionGranted(address indexed user, address indexed sessionAccount, uint256 spendingLimit, uint256 expiresAt, uint256 timestamp)
+          - event: ServiceExecuted(address indexed user, address indexed sessionAccount, uint8 indexed serviceType, uint256 cost, uint256 remainingBudget, uint256 timestamp)
+          - event: PermissionRevoked(address indexed user, address indexed sessionAccount, uint256 timestamp)
 
 field_selection:
   transaction_fields:

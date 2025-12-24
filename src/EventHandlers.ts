@@ -47,7 +47,7 @@ const getOrCreateDailyStats = async (timestamp: any, context: any) => {
  * Emitted when a user grants spending permission to the app
  */
 PermiPayBilling.PermissionGranted.handler(async ({ event, context }: any) => {
-  const { user, spendingLimit, expiresAt, timestamp } = event.params;
+  const { user, sessionAccount, spendingLimit, expiresAt, timestamp } = event.params;
 
   // Create or update permission entity
   const permission = {
@@ -85,7 +85,7 @@ PermiPayBilling.PermissionGranted.handler(async ({ event, context }: any) => {
  * Emitted when a user accesses a service and gets charged
  */
 PermiPayBilling.ServiceExecuted.handler(async ({ event, context }: any) => {
-  const { user, serviceType, cost, remainingBudget, timestamp } = event.params;
+  const { user, sessionAccount, serviceType, cost, remainingBudget, timestamp } = event.params;
   const txHash = event.transaction.hash;
 
   // Create service execution record
@@ -141,7 +141,7 @@ PermiPayBilling.ServiceExecuted.handler(async ({ event, context }: any) => {
  * Emitted when a user manually revokes their permission
  */
 PermiPayBilling.PermissionRevoked.handler(async ({ event, context }: any) => {
-  const { user, timestamp } = event.params;
+  const { user, sessionAccount, timestamp } = event.params;
 
   // Update permission
   const permission = await context.Permission.get(user.toLowerCase());
