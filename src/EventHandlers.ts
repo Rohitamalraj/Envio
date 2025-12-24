@@ -1,6 +1,6 @@
-import {
-  PermiPayBilling,
-} from "../generated/index.js";
+import * as Generated from "../generated/index.js";
+
+const PermiPayBilling = Generated.PermiPayBilling;
 
 // Helper to get or create global stats
 const getOrCreateGlobalStats = async (context: any) => {
