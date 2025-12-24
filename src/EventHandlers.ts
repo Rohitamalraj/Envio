@@ -3,7 +3,7 @@ const {
 } = require("generated");
 
 // Helper to get or create global stats
-const getOrCreateGlobalStats = async (context: any): Promise<GlobalStats> => {
+const getOrCreateGlobalStats = async (context: any) => {
   let stats = await context.GlobalStats.get("global");
   if (!stats) {
     stats = {
@@ -20,7 +20,7 @@ const getOrCreateGlobalStats = async (context: any): Promise<GlobalStats> => {
 }
 
 // Helper to get or create daily stats
-const getOrCreateDailyStats = async (timestamp: bigint, context: any): Promise<DailyStats> => {
+const getOrCreateDailyStats = async (timestamp: any, context: any) => {
   const date = new Date(Number(timestamp) * 1000);
   const dateStr = date.toISOString().split('T')[0];
   
@@ -46,7 +46,7 @@ const getOrCreateDailyStats = async (timestamp: bigint, context: any): Promise<D
  * Handler for PermissionGranted event
  * Emitted when a user grants spending permission to the app
  */
-PermiPayBilling.PermissionGranted.handler(async ({ event, context }) => {
+PermiPayBilling.PermissionGranted.handler(async ({ event, context }: any) => {
   const { user, spendingLimit, expiresAt, timestamp } = event.params;
 
   // Create or update permission entity
@@ -84,7 +84,7 @@ PermiPayBilling.PermissionGranted.handler(async ({ event, context }) => {
  * Handler for ServiceExecuted event
  * Emitted when a user accesses a service and gets charged
  */
-PermiPayBilling.ServiceExecuted.handler(async ({ event, context }) => {
+PermiPayBilling.ServiceExecuted.handler(async ({ event, context }: any) => {
   const { user, serviceType, cost, remainingBudget, timestamp } = event.params;
   const txHash = event.transaction.hash;
 
@@ -140,7 +140,7 @@ PermiPayBilling.ServiceExecuted.handler(async ({ event, context }) => {
  * Handler for PermissionRevoked event
  * Emitted when a user manually revokes their permission
  */
-PermiPayBilling.PermissionRevoked.handler(async ({ event, context }) => {
+PermiPayBilling.PermissionRevoked.handler(async ({ event, context }: any) => {
   const { user, timestamp } = event.params;
 
   // Update permission
