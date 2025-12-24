@@ -1,0 +1,13 @@
+{
+  "name": "permipay-envio-indexer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "codegen": "envio codegen",
+    "dev": "envio dev",
+    "start": "envio start"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

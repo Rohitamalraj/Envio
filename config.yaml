@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=./node_modules/envio/evm.schema.json
+name: permipay-analytics
+description: PermiPay Analytics Indexer - Permission-metered billing tracker
+version: 2.23.3
+ecosystem: evm
+networks:
+  - id: 11155111 # Ethereum Sepolia
+    start_block: 7337440 # Block when contract was deployed
+    contracts:
+      - name: PermiPayBilling
+        address: 
+          - "0x6B3c3435DfC8dE86018dC311915E8D7af826c3Fa" # Deployed PermiPayBilling contract
+        handler: src/EventHandlers.ts
+        events:
+          - event: PermissionGranted(address indexed user, uint256 spendingLimit, uint256 expiresAt, uint256 timestamp)
+          - event: ServiceExecuted(address indexed user, uint8 indexed serviceType, uint256 cost, uint256 remainingBudget, uint256 timestamp)
+          - event: PermissionRevoked(address indexed user, uint256 timestamp)
+
+field_selection:
+  transaction_fields:
+    - "from"
+    - "to"
+    - "hash"
+    - "transactionIndex"

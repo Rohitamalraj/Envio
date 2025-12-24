@@ -1,0 +1,63 @@
+"""
+GraphQL schema for PermiPay Analytics Envio indexer
+Tracks permission grants, service executions, and usage analytics
+"""
+
+# User permission entity
+type Permission @entity {
+  id: ID!                          # user address
+  user: String!                    # user wallet address
+  spendingLimit: BigInt!           # total authorized USDC (6 decimals)
+  spentAmount: BigInt!             # amount spent so far
+  remainingBudget: BigInt!         # calculated: spendingLimit - spentAmount
+  expiresAt: BigInt!               # expiry timestamp
+  isActive: Boolean!               # permission status
+  grantedAt: BigInt!               # grant timestamp
+  revokedAt: BigInt                # revocation timestamp (if revoked)
+  servicesUsed: [ServiceExecution!]! @derivedFrom(field: "permission")
+  totalExecutions: Int!            # total services executed
+}
+
+# Individual service execution record
+type ServiceExecution @entity {
+  id: ID!                          # tx hash + log index
+  permission: Permission!          # reference to user permission
+  user: String!                    # user address
+  serviceType: ServiceType!        # which service was executed
+  cost: BigInt!                    # cost in USDC (6 decimals)
+  remainingBudget: BigInt!         # budget after this execution
+  timestamp: BigInt!               # execution timestamp
+  transactionHash: String!         # transaction hash
+}
+
+# Service type enum
+enum ServiceType {
+  CONTRACT_INSPECTOR
+  WALLET_REPUTATION
+  WALLET_AUDIT
+}
+
+# Global analytics
+type GlobalStats @entity {
+  id: ID!                          # singleton: "global"
+  totalPermissionsGranted: BigInt! # total permissions ever granted
+  activePermissions: BigInt!       # currently active permissions
+  totalRevenue: BigInt!            # total USDC collected (6 decimals)
+  totalExecutions: BigInt!         # total service executions
+  uniqueUsers: BigInt!             # unique user count
+  lastUpdated: BigInt!             # last update timestamp
+}
+
+# Daily analytics aggregation
+type DailyStats @entity {
+  id: ID!                          # date in format YYYY-MM-DD
+  date: String!                    # human readable date
+  permissionsGranted: Int!         # permissions granted this day
+  permissionsRevoked: Int!         # permissions revoked this day
+  serviceExecutions: Int!          # total executions this day
+  revenue: BigInt!                 # revenue this day (USDC)
+  uniqueUsers: Int!                # unique users this day
+  contractInspectorCount: Int!     # Contract Inspector executions
+  walletReputationCount: Int!      # Wallet Reputation executions
+  walletAuditCount: Int!           # Wallet Audit executions
+}
