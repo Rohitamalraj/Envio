@@ -1,7 +1,6 @@
 # yaml-language-server: $schema=./node_modules/envio/evm.schema.json
 name: permipay-analytics
 description: PermiPay Analytics Indexer - Permission-metered billing tracker
-version: 2.23.3
 ecosystem: evm
 networks:
   - id: 11155111 # Ethereum Sepolia
