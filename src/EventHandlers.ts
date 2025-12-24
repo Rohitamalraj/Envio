@@ -1,6 +1,6 @@
 import {
   PermiPayBilling,
-} from "../generated/src/Handlers.gen.js";
+} from "../generated/src/Handlers.gen";
 
 // Helper to get or create global stats
 const getOrCreateGlobalStats = async (context: any) => {
